@@ -36,14 +36,14 @@ def string_to_register(string):
 
     return register
 
+
 #Packages
 import os
 
 #This is the file path of the file you wish to decode. Change this! VVV
 hex_file_path = 'C:\\Classes\\2023-2024\\CS 4200 - Comp. Arch\\CS 4200 Repo\\Disassembler\\decode.hex'
-
-
 hex_file = '' #This will store a file object if filepath is valid
+
 #if file path is valid, open it
 print("Checking current directory for specified file: " + hex_file_path)
 if os.path.isfile(hex_file_path):
@@ -163,7 +163,10 @@ while string_index < len(file_contents):
    elif instruction_bytes[0] == '3':
        
        #Get our destination & the value we are putting in that register
+<<<<<<< HEAD
         discard = file_contents[string_index]# This is a place
+=======
+>>>>>>> parent of 68ead7d (Update Disassembler.py)
         destination = string_to_register(file_contents[string_index+1])
         value = file_contents[(string_index+2):(string_index+2)+6]
         string_index += 8 #don't forget to iterate index to match
