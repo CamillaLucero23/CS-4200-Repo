@@ -163,7 +163,7 @@ while string_index < len(file_contents):
    elif instruction_bytes[0] == '3':
        
        #Get our destination & the value we are putting in that register
-        #We skip a byte because it is not needed for our purposes. It is just a placeholder
+        discard = file_contents[string_index]# This is a place
         destination = string_to_register(file_contents[string_index+1])
         value = file_contents[(string_index+2):(string_index+2)+6]
         string_index += 8 #don't forget to iterate index to match
@@ -215,7 +215,9 @@ while string_index < len(file_contents):
 
        instruction_string = instruction_string + ' 0x' + destination
 
+
     #Once we are done, print our instruction string
+       
    if len(instruction_string) == 0:
        print("Something went wrong, no instruction found...")
     
