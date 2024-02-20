@@ -36,6 +36,11 @@ def string_to_register(string):
 
     return register
 
+#converts any immediate values into little endian
+def hex_to_little_endian(hex):
+    little_endian_hex = hex[::-1]
+    return little_endian_hex
+
 #---------------------------------------------------------
 #Packages
 import os
@@ -131,12 +136,11 @@ while string_index < len(file_contents):
        if instruction_bytes[0] == instruction: 
             
             #In the case of multi-functional instructions, get that
-           if instruction_bytes[1] == 0:
+           if instruction_bytes[1] != 0:
                
                for instruction_type in y86_instruction_set[instruction]:
                    if instruction_bytes[1] == instruction_type:
-                       
-                       print(y86_instruction_set[instruction][instruction_type])
+        
                        instruction_string = y86_instruction_set[instruction][instruction_type]
                        break 
             
@@ -160,13 +164,13 @@ while string_index < len(file_contents):
        #Then concatinate to our instruction_string
        instruction_string = instruction_string + ' ' + source + ', ' + destination
     
-    #If immediate to register move...
+    #If immediate to register move or immediate operation...
    elif instruction_bytes[0] in '3c':
        
        #Get our destination & the value we are putting in that register
         #There is a placeholder hex here, but we dont need it for our purposes. We skip it
         destination = string_to_register(file_contents[string_index+1])
-        value = file_contents[(string_index+2):(string_index+2)+16]
+        value = hex_to_little_endian(file_contents[(string_index+2):(string_index+2)+16]).lstrip('0')
         string_index += 18 #don't forget to iterate index to match
 
        #Then concatinate to our instruction_string

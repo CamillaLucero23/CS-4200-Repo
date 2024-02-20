@@ -1,0 +1,38 @@
+Checking current directory for specified file: C:\Classes\2023-2024\CS 4200 - Comp. Arch\CS 4200 Repo\Disassembler\decode.hex
+File found! Opening File...
+Closing File...
+
+
+Starting Disassemble...
+---------------------------------------------------------------------------
+irmovq $0x4000,%rsp
+mrmovq (%rbp) ,%r8
+irmovq $0x433543230303,%rcx
+iaddq $0xffffffffffffffff,%rcx
+pushq %rcx
+ixorq $0x,%rcx
+popq %rcx
+je 0x4200000000000000
+pushq %rbp
+ret
+iaddq $0x80,%r8
+mrmovq (%rbp) ,%r8
+pushq %rbp
+ret
+halt
+halt
+halt
+halt
+halt
+halt
+halt
+halt
+halt
+halt
+halt
+halt
+halt
+halt
+halt
+---------------------------------------------------------------------------
+End of Disassemble
