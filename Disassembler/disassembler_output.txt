@@ -5,17 +5,17 @@ Closing File...
 
 Starting Disassemble...
 ---------------------------------------------------------------------------
-irmovq $0x4000,%rsp
+irmovq $0x400,%rsp
 mrmovq (%rbp) ,%r8
-irmovq $0x433543230303,%rcx
-iaddq $0xffffffffffffffff,%rcx
+irmovq $0x345334323030,%rcx
+iaddq $0xFFFFFFFFFFFFFFFF,%rcx
 pushq %rcx
 ixorq $0x,%rcx
 popq %rcx
 je 0x4200000000000000
 pushq %rbp
 ret
-iaddq $0x80,%r8
+iaddq $0x8,%r8
 mrmovq (%rbp) ,%r8
 pushq %rbp
 ret
