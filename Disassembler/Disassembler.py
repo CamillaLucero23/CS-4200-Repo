@@ -37,9 +37,17 @@ def string_to_register(string):
     return register
 
 #converts any immediate values into little endian
-def hex_to_little_endian(hex):
-    little_endian_hex = hex[::-1]
-    return little_endian_hex
+def hex_to_little_endian(hex_string):
+    #Change our string into a byte string
+    hex_num = bytes(hex_string, 'utf-8')
+    #make it into a byte array
+    big = bytearray.fromhex(str(hex_num, 'utf-8'))
+    #Reverse
+    big.reverse()
+    #Then flip every 2 hex
+    little = ''.join(f"{n:02X}" for n in big)
+   
+    return little
 
 #---------------------------------------------------------
 #Packages
