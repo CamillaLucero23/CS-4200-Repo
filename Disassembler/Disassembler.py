@@ -36,15 +36,15 @@ def string_to_register(string):
 
     return register
 
-
-
+#---------------------------------------------------------
 #Packages
 import os
 
 #This is the file path of the file you wish to decode. Change this! VVV
 hex_file_path = 'C:\\Classes\\2023-2024\\CS 4200 - Comp. Arch\\CS 4200 Repo\\Disassembler\\decode.hex'
-hex_file = '' #This will store a file object if filepath is valid
 
+
+hex_file = '' #This will store a file object if filepath is valid
 #if file path is valid, open it
 print("Checking current directory for specified file: " + hex_file_path)
 if os.path.isfile(hex_file_path):
@@ -63,7 +63,6 @@ file_contents = hex_file.read()
 #Close file
 print("Closing File...")
 hex_file.close()
-
 
 #This nested dictionary stores all potenial combos within the y86 instruction set for easier printing
 y86_instruction_set = {
@@ -103,9 +102,14 @@ y86_instruction_set = {
 
     '9': {'0': 'ret'}, #return
 
-    'A': {'0': 'pushq'}, #Stack push, 2 bytes max
+    'a': {'0': 'pushq'}, #Stack push, 2 bytes max
 
-    'B': {'0': 'popq'}, # Stack pop, 2 bytes max
+    'b': {'0': 'popq'}, # Stack pop, 2 bytes max
+
+    'c': {'0': 'iaddq', #immediate value operations, 10 bytes max
+          '1': 'isubq',
+          '2': 'iandq',
+          '3': 'ixorq'},
 } #end of instruction set dictionary
 
 print("\n\nStarting Disassemble... ")
@@ -114,15 +118,11 @@ print("-------------------------------------------------------------------------
 #Variable for string indexing
 string_index = 0
 
-#TEST SPACE
-#
-#
-
 while string_index < len(file_contents):
    
    instruction_string = '' #Variable used for printing
 
-   #Grab first two instruction bytes and iterate index to match
+   #Grab first two instruction hex and iterate index to match
    instruction_bytes = file_contents[string_index] + file_contents[string_index+1]
    string_index += 2
 
@@ -140,17 +140,17 @@ while string_index < len(file_contents):
                        instruction_string = y86_instruction_set[instruction][instruction_type]
                        break 
             
-            #If our second byte is not zero, then we have a 'plain' instruction
+            #If our second hex is not zero, then we have a 'plain' instruction
            else:           
                 #Set that into our instruction print
                 instruction_string = y86_instruction_set[instruction]['0']
                 break
     
     #Now that we have our instruction within our print tring, we can decide what else we need
-    #from the next few bytes
+    #from the next few hex values
     #If any instruction requiring a source and destination...
     #(register to register, operation, push, or pop)
-   if instruction_bytes[0] in '26AB':
+   if instruction_bytes[0] in '26':
        
        #obtain our registers & convert them to readable text
        source = string_to_register(file_contents[string_index]) 
@@ -158,19 +158,19 @@ while string_index < len(file_contents):
        string_index +=2 #dont forget to iterate index to match
 
        #Then concatinate to our instruction_string
-       instruction_string = instruction_string + ' ' + source + ' ' + destination
+       instruction_string = instruction_string + ' ' + source + ', ' + destination
     
     #If immediate to register move...
-   elif instruction_bytes[0] == '3':
+   elif instruction_bytes[0] in '3c':
        
        #Get our destination & the value we are putting in that register
-        #There is a placeholder bit here, but we dont need it for our purposes. We skip it
+        #There is a placeholder hex here, but we dont need it for our purposes. We skip it
         destination = string_to_register(file_contents[string_index+1])
-        value = file_contents[(string_index+2):(string_index+2)+6]
-        string_index += 8 #don't forget to iterate index to match
+        value = file_contents[(string_index+2):(string_index+2)+16]
+        string_index += 18 #don't forget to iterate index to match
 
        #Then concatinate to our instruction_string
-        instruction_string = instruction_string + ' $0x' + str(value) + ' ' + destination
+        instruction_string = instruction_string + ' $0x' + str(value) + ',' + destination
     
     #If register to memory move...
    elif instruction_bytes[0] == '4':
@@ -178,17 +178,17 @@ while string_index < len(file_contents):
        #Get our source, destination, and address offset
        source = string_to_register(file_contents[string_index])
        destination = string_to_register(file_contents[string_index+1])
-       address = file_contents[(string_index+2):(string_index+2)+6]
-       string_index += 8 #don't forget to iterate index to match
+       address = file_contents[(string_index+2):(string_index+2)+16]
+       string_index += 18 #don't forget to iterate index to match
 
         #Check if address is equal to 0, for formatting 
        if int(address,16) == 0x0:
            
-           instruction_string = instruction_string + ' ' + source + ' (' + destination + ')'
+           instruction_string = instruction_string + ' ' + source + ', (' + destination + ')'
 
        else:
            
-           instruction_string = instruction_string + ' ' + source + ' 0x' + address + ' (' + destination + ')'
+           instruction_string = instruction_string + ' ' + source + ', 0x' + address + ' (' + destination + ')'
 
    #if memory to register move...
    elif instruction_bytes[0] == '5':
@@ -196,31 +196,44 @@ while string_index < len(file_contents):
        #Get our source, destination, and address offset
        source = string_to_register(file_contents[string_index])
        destination = string_to_register(file_contents[string_index+1])
-       address = file_contents[(string_index+2):(string_index+2)+6]
-       string_index += 8 #don't forget to iterate index to match
+       address = file_contents[(string_index+2):(string_index+2)+16]
+       string_index += 18 #don't forget to iterate index to match
 
         #Check if address is equal to 0, for formatting
        if int(address,16) == 0x0:
            
-           instruction_string = instruction_string + ' (' + source + ') ' + destination
+           instruction_string = instruction_string + ' (' + source + ') ,' + destination
 
        else:
            
-           instruction_string = instruction_string + ' 0x' + address + ' (' + source + ') ' + destination
+           instruction_string = instruction_string + ' 0x' + address + ' (' + source + ') ,' + destination
     
    #if a call or jump instruction
    elif instruction_bytes[0] in '78':
        
-       destination = file_contents[string_index:(string_index + 7)]
-       string_index += 7
+       destination = file_contents[string_index:(string_index + 16)]
+       string_index += 16
 
        instruction_string = instruction_string + ' 0x' + destination
+    
+    #if a push or pop...
+   elif instruction_bytes[0] in 'ab':
+        #obtain our registers & convert them to readable text
+       destination = string_to_register(file_contents [string_index])
+       #Another place holder hex, so we skip
+       string_index +=2 #dont forget to iterate index to match
 
+       #Then concatinate to our instruction_string
+       instruction_string = instruction_string + ' ' + destination
+       
 
     #Once we are done, print our instruction string
-       
+    #If our instruction string has a length of 0, an instruction wasn't paired and something went wrong
    if len(instruction_string) == 0:
        print("Something went wrong, no instruction found...")
-    
+    #Else, everything went successfully :)
    else:
        print(instruction_string)
+
+print("---------------------------------------------------------------------------")
+print("End of Disassemble")
