@@ -3,6 +3,7 @@ Camilla Lucero
 CS 4200
 Disassembler
 '''
+
 #Function that turns a string digit/character to a y86 register
 def string_to_register(string):
     register = '%'
@@ -98,7 +99,7 @@ y86_instruction_set = {
 
     '5': {'0': 'mrmovq'}, #mem. to reg., requires register & mem address check, can be up to 10 bytes
 
-    '6': {'0': 'addq',    #operations, 2 bytes max
+    '6': {'0': 'addq',    #reg to reg operations, 2 bytes max
           '1': 'subq',
           '2': 'andq',
           '3': 'xorq'},
@@ -223,7 +224,7 @@ while string_index < len(file_contents):
    #if a call or jump instruction
    elif instruction_bytes[0] in '78':
        
-       destination = file_contents[string_index:(string_index + 16)]
+       destination = hex_to_little_endian(file_contents[string_index:(string_index + 16)])
        string_index += 16
 
        instruction_string = instruction_string + ' 0x' + destination

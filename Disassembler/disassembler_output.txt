@@ -12,7 +12,7 @@ iaddq $0xFFFFFFFFFFFFFFFF,%rcx
 pushq %rcx
 ixorq $0x,%rcx
 popq %rcx
-je 0x4200000000000000
+je 0x0000000000000042
 pushq %rbp
 ret
 iaddq $0x8,%r8
